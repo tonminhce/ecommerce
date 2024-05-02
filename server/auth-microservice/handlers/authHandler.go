@@ -62,3 +62,24 @@ func (l *Login) VerifyToken(context *gin.Context) {
 	}
 	ok(context, http.StatusOK, "token is valid", claims)
 }
+
+func (l *Login) SignUp(context *gin.Context) {
+	var user models.User
+	if err := context.ShouldBindJSON(&user); err != nil {
+		errors := []models.ErrorDetail{{
+			ErrorType:    models.ErrorTypeValidation,
+			ErrorMessage: fmt.Sprintf("%v", err),
+		}}
+		badRequest(context, http.StatusBadRequest, "Invalid request", errors)
+		return
+	}
+
+	err := l.loginService.SignUp(user)
+	if err != nil {
+		errors := []models.ErrorDetail{*err}
+		badRequest(context, http.StatusBadRequest, "Error in signing up", errors)
+		return
+	}
+
+	ok(context, http.StatusOK, "User created successfully", nil)
+}

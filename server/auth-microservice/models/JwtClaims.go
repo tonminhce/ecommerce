@@ -9,14 +9,14 @@ import (
 )
 
 type JwtClaims struct {
-	ComapnyId string `json:"comapnyId,omitempty"`
-	Username  string `json:"username,omitempty"`
-	Roles     []int  `json:"roles,omitempty"`
+	UserID   string `json:"userId,omitempty"`
+	Username string `json:"username,omitempty"`
+	Roles    []int  `json:"roles,omitempty"`
 	jwt.StandardClaims
 }
 
 func (claims JwtClaims) Valid() error {
-	var now = time.Now().UTC().Unix()
+	now := time.Now().UTC().Unix()
 	flags, _ := GetFlags()
 	url, _ := flags.GetApplicationUrl()
 	if claims.VerifyExpiresAt(now, true) && claims.VerifyIssuer(*url, true) {

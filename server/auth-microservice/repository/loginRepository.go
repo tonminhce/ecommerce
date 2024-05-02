@@ -49,3 +49,23 @@ func (l *Login) GetUserByUserName(userName, password string) (models.User, *mode
 	}
 	return user, nil
 }
+
+func (l *Login) CreateUser(user models.User) *models.ErrorDetail {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return &models.ErrorDetail{
+			ErrorType:    models.ErrorTypeError,
+			ErrorMessage: "Error hashing password",
+		}
+	}
+
+	_, err = l.db.Exec("INSERT INTO users (email, password) VALUES ($1, $2)", user.UserName, hashedPassword)
+	if err != nil {
+		return &models.ErrorDetail{
+			ErrorType:    models.ErrorTypeError,
+			ErrorMessage: "Error creating user",
+		}
+	}
+
+	return nil
+}

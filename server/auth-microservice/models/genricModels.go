@@ -9,6 +9,7 @@ const (
 	ErrorTypeInfo         = "Info"
 	ErrorTypeDebug        = "Debug"
 	ErrorTypeUnauthorized = "Unauthorized"
+	ErrorTypeConflict     = "Conflict"
 )
 
 type ErrorDetail struct {

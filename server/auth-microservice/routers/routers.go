@@ -32,5 +32,6 @@ func (r *Login) RegisterRoutes() *gin.Engine {
 	ginEngine := gin.Default()
 	ginEngine.POST("/login", r.loginHandler.Login)
 	ginEngine.POST("/verifyToken", r.loginHandler.VerifyToken)
+	ginEngine.POST("/signup", r.loginHandler.SignUp)
 	return ginEngine
 }

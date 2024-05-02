@@ -31,20 +31,34 @@ func (l *Login) GetToken(loginModel models.LoginRequest, origin string) (string,
 	if err != nil {
 		return "", err
 	}
-	var claims = &models.JwtClaims{
-		ComapnyId: strconv.Itoa(user.Id),
-		Username:  user.Name,
-		Roles:     user.Roles,
+	claims := &models.JwtClaims{
+		UserID:   strconv.Itoa(user.Id),
+		Username: user.Name,
+		Roles:    user.Roles,
 		StandardClaims: jwt.StandardClaims{
 			Audience: origin,
 		},
 	}
-	var tokenCreationTime = time.Now().UTC()
-	var expirationTime = tokenCreationTime.Add(time.Duration(2) * time.Hour)
-	return token.GenrateToken(claims, expirationTime)
+	tokenCreationTime := time.Now().UTC()
+	expirationTime := tokenCreationTime.Add(2 * time.Hour)
+	return token.GenerateToken(claims, expirationTime)
 
 }
 
 func (*Login) VerifyToken(tokenString, referer string) (bool, *models.JwtClaims) {
 	return token.VerifyToken(tokenString, referer)
+}
+
+func (l *Login) SignUp(user models.User) *models.ErrorDetail {
+	// Check if the user already exists
+	_, err := l.loginRepository.GetUserByUserName(user.UserName, user.Password)
+	if err == nil {
+		return &models.ErrorDetail{
+			ErrorType:    models.ErrorTypeConflict,
+			ErrorMessage: "User already exists",
+		}
+	}
+
+	// Create the user
+	return l.loginRepository.CreateUser(user)
 }
